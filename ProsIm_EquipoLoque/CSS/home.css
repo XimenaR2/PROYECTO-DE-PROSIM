@@ -1,0 +1,35 @@
+
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: rgb(197, 250, 197);
+    margin: 0;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    background-color: #d8755c;
+    color: white;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #d64d2a;
+}
+
+video, canvas {
+    border: 2px solid black;
+    border-radius: 10px;
+    height: 720px;
+    width: 980px;
+    margin: 10px
+}
+
+.escaner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
