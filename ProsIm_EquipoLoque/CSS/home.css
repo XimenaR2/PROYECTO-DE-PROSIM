@@ -1,0 +1,154 @@
+
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0b3d91, #43e5c7);
+    margin: 0;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    background-color: #d8755c;
+    color: white;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #d64d2a;
+}
+
+video, canvas {
+    border: 2px solid black;
+    border-radius: 10px;
+    height: 720px;
+    width: 980px;
+    margin: 10px
+}
+
+.escaner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+
+.scanner-section{
+    text-align:center;
+    padding:40px 20px;
+}
+
+.scanner-header h2{
+    font-size:28px;
+}
+
+.scanner-header h4{
+    margin-bottom:30px;
+    color:#fceded;
+}
+
+/* Cámara */
+.camera-container{
+    display:flex;
+    justify-content:center;
+    margin-bottom:20px;
+}
+/*PORMIENTRAS QUITAR DESPUES*/
+video, canvas{
+    width:400px;
+    height:300px;
+    border-radius:10px;
+    border:2px solid #ccc;
+}
+/*PORMIENTRAS QUITAR DESPUES  fin*/
+
+
+#reader{
+    width:100%;
+    max-width:450px;
+}
+
+/* Botones cámara */
+.camera-buttons{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    margin-bottom:40px;
+    flex-wrap:wrap;
+}
+
+.camera-buttons button{
+    padding:12px 20px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+/* Sección inferior */
+.bottom-section{
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    flex-wrap:wrap; /* 🔥 clave para responsive */
+}
+
+/* Caja información */
+.info-box{
+    width:100%;
+    max-width:400px;
+    min-height:200px;
+    border:2px solid black;
+    padding:15px;
+    text-align:left;
+}
+
+/* Botones verticales */
+.actions{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    width:100%;
+    max-width:200px;
+}
+
+.actions button{
+    padding:10px;
+    cursor:pointer;
+}
+
+/* 📱 RESPONSIVE PARA CELULAR */
+@media (max-width:768px){
+
+    .scanner-header h2{
+        font-size:22px;
+    }
+
+    .scanner-header h4{
+        font-size:14px;
+    }
+
+    .bottom-section{
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .actions{
+        align-items:center;
+    }
+
+}
+
+#btnReiniciar{
+    background-color:#28a745;
+    color:white;
+    border:none;
+}
+
+#btnActivar{
+    background-color:#007bff;
+    color:white;
+    border:none;
+}
