@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina Escáner</title>
+    <link rel="stylesheet" href="../CSS/header.css">
+    <link rel="stylesheet" href="../CSS/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="header-outer"><!-- header-->
+        <div class="header-inner responsive-wrapper">
+            <div class="header-logo">
+            <img src="../MULTIMEDIA/quiz1.jpg" alt="" >
+            <h2>VE EL VAR</h2>
+        </div>
+            <nav class="header-navigation">
+                <a href="home.html">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Escáner</span>
+                </a>
+
+                <a href="quiz.html">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Quiz</span>
+                </a>
+
+                <a href="estadisticas.html">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Estadísticas</span>
+                </a>
+
+                <a href="filtros.html">
+                    <i class="fas fa-video"></i>
+                    <span>Edición</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+<!--Escaner-->
+<!--
+<h2>Escanear con Cámara</h2>
+<h4>Escanea documentos desde tu dispositivo móvil a tu navegador</h4>
+<div class="escaner">
+    <video id="video" width="400" autoplay></video>
+    <canvas id="canvas" width="400"></canvas>
+</div>
+    <button id="btnActivar">Activar Cámara</button>
+    <button id="btnFoto">Escanear</button>
+    <button id="btnReset">Apagar Cámara</button>
+
+    <article>
+        <h4>Información</h4>
+        <p></p>
+    </article>
+
+    <aside>
+        <button>Animar</button>
+        <button>Baile</button>
+        <button>Saludo</button>
+        <button>Efectos</button>
+    </aside>
+    
+-->
+
+<!--Escaner-->
+
+<section class="scanner-section">
+
+    <div class="scanner-header">
+        <h2>Escanear con Cámara</h2>
+        <h4>Escanea documentos desde tu dispositivo móvil a tu navegador</h4>
+    </div>
+
+    <!-- Contenedor cámara -->
+    <div class="camera-container">
+        <video id="video" autoplay></video>
+    </div>
+
+
+    <!-- <div class="camera-container">
+        <div id="reader"></div>
+    </div> -->
+
+    <!-- Botones cámara -->
+    <div class="camera-buttons">
+        <button id="btnActivar">Abrir Cámara</button>
+        <button id="btnFoto">Escanear</button>
+        <button id="btnReiniciar" style="display:none;">Escanear otro</button>
+    </div>
+
+    <!-- Sección inferior -->
+    <div class="bottom-section">
+
+        <!-- INFORMACION -->
+        <article class="info-box">
+            <h3>INFORMACION</h3>
+            <p id="infoText"></p>
+        </article>
+
+        <!-- Botones verticales -->
+        <aside class="actions">
+            <button>Saludo</button>
+            <button>Baile</button>
+            <button>Efecto 1</button>
+            <button>Efecto 2</button>
+        </aside>
+
+    </div>
+
+</section>
+
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- <script src="../JS/script.js"></script> -->
+    <script src="../JS/home-2.js"></script>
+
+</body>
+</html>

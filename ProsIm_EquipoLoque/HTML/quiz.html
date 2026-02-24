@@ -7,25 +7,41 @@
     </title>
     <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/quiz.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <header class="header-outer"><!-- header-->
         <div class="header-inner responsive-wrapper">
             <div class="header-logo">
-            <img src="quiz1.jpg" alt="" style="width: 90px; height: 90px; border-radius: 70%;">
-            <h2>TITULO</h2>
+            <img src="../MULTIMEDIA/quiz1.jpg" alt="" >
+            <h2>VE EL VAR</h2>
         </div>
-            <nav class="header-navigation">
-                    <a href="home.html">Escaner</a>
-                    <a href="quiz.html">Quiz</a>
-                    <a href="">Estadisticas</a>
-                    <a href="">Edición de video</a>
+             <nav class="header-navigation">
+                <a href="home.html">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Escáner</span>
+                </a>
+
+                <a href="quiz.html">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Quiz</span>
+                </a>
+
+                <a href="estadisticas.html">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Estadísticas</span>
+                </a>
+
+                <a href="filtros.html">
+                    <i class="fas fa-video"></i>
+                    <span>Edición</span>
+                </a>
             </nav>
         </div>
     </header>
 
 <div class="container">
-    <h1> Quiz Mundial 2026</h1>
+    <h2> Quiz Mundial 2026</h2>
     <div class="question" id="question"></div>
     <img id="image" src="">
     <div class="answers" id="answers"></div>
@@ -33,92 +49,7 @@
 
 <button class="next-btn" id="nextBtn">Siguiente pregunta ➡</button>
 
-<script>
-const quiz = [
-{
-    question: "¿Qué países serán sede del Mundial 2026?",
-    image: "../MULTIMEDIA/quiz2.jpg",
-    answers: [
-        "Brasil, Argentina y Uruguay",
-        "Estados Unidos, México y Canadá",
-        "España, Portugal y Marruecos",
-        "Alemania, Francia e Italia"
-    ],
-    correct: 1
-},
-{
-    question: "¿Cuántos equipos participarán en el Mundial 2026?",
-    image: "../MULTIMEDIA/mundial1.jpg",
-    answers: [
-        "32 equipos",
-        "40 equipos",
-        "48 equipos",
-        "24 equipos"
-    ],
-    correct: 2
-},
-{
-    question: "¿Qué país albergará la final del Mundial 2026?",
-    image: "../MULTIMEDIA/images.jpg",
-    answers: [
-        "México",
-        "Estados Unidos",
-        "Canadá",
-        "Brasil"
-    ],
-    correct: 1
-}
-];
-
-let currentQuestion = 0;
-const questionEl = document.getElementById("question");
-const imageEl = document.getElementById("image");
-const answersEl = document.getElementById("answers");
-const nextBtn = document.getElementById("nextBtn");
-
-function loadQuestion(){
-    nextBtn.style.display = "none";
-    answersEl.innerHTML = "";
-
-    const q = quiz[currentQuestion];
-    questionEl.textContent = q.question;
-    imageEl.src = q.image;
-
-    q.answers.forEach((answer, index)=>{
-        const button = document.createElement("button");
-        button.textContent = answer;
-
-        button.addEventListener("click", ()=>{
-            if(index === q.correct){
-                button.classList.add("correct");
-            } else{
-                button.classList.add("incorrect");
-            }
-
-            Array.from(answersEl.children).forEach(btn=>{
-                btn.disabled = true;
-                if(q.correct === Array.from(answersEl.children).indexOf(btn)){
-                    btn.classList.add("correct");
-                }
-            });
-
-            nextBtn.style.display = "block";
-        });
-
-        answersEl.appendChild(button);
-    });
-}
-
-nextBtn.addEventListener("click", ()=>{
-    currentQuestion++;
-    if(currentQuestion >= quiz.length){
-        currentQuestion = 0;
-    }
-    loadQuestion();
-});
-
-loadQuestion();
-</script>
+<script src="../JS/quiz.js"></script>
 
 </body>
 </html>
