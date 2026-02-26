@@ -1,6 +1,5 @@
 .stats-page {
   min-height: calc(100vh - 110px);
-  background: linear-gradient(90deg, #0f4c81, #33c6b8);
   padding: 50px 40px;
   color: white;
   text-align: center;
@@ -19,18 +18,39 @@
 }
 
 /* CARD */
+.frame {
+  border: 40px solid transparent;
+  border-image-source: url("../MULTIMEDIA/white_grass.jpeg");
+  border-image-slice: 120;
+  border-image-repeat: repeat;
+  padding: 0px;
+  border-radius: 12px;
+
+}
+
+
 .stats-card {
   max-width: 1200px;
   margin: 0 auto;
   background: rgb(170, 209, 177);
   border-radius: 18px;
-  padding: 24px;
+  padding: 0px;
   box-shadow: 0 25px 45px rgba(0,0,0,0.35);
   overflow-x: auto;
+  border-radius: 12px;
+
 }
 
-/* TABLE */
-.stats-table {
+body {
+  background-image: url("../MULTIMEDIA/grass.jpg");
+  background-repeat: repeat;
+  background-size: 500px 500px;
+      margin:0;
+
+}
+
+/*
+<!--- .stats-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 800px;
@@ -61,7 +81,6 @@
   background: #f4fdfc;
 }
 
-/* POINTS + DIFFERENCE */
 .highlight {
   background: #33c6b8;
   color: white;
@@ -79,9 +98,91 @@
   font-weight: bold;
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .stats-page {
     padding: 30px 20px;
+  }
+}
+ TABLE */
+
+ body {
+  font-family: 'lato', sans-serif;
+}
+.container {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 5px;
+  padding-right: 5px;
+
+}
+
+
+h2 {
+  font-size: 26px;
+  margin: 20px 0;
+  text-align: center;
+  small {
+    font-size: 0.5em;
+  }
+}
+
+.responsive-table {
+  li {
+    border-radius: 3px;
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+  }
+  .table-header {
+    background-color: #95A5A6;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .table-row {
+    background-color: #ffffff;
+    box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.1);
+  }
+  .col-1 {
+    flex-basis: 10%;
+  }
+  .col-2 {
+    flex-basis: 40%;
+  }
+  .col-3 {
+    flex-basis: 25%;
+  }
+  .col-4 {
+    flex-basis: 25%;
+  }
+  
+  @media all and (max-width: 767px) {
+    .table-header {
+      display: none;
+    }
+    .table-row{
+      
+    }
+    li {
+      display: block;
+    }
+    .col {
+      
+      flex-basis: 100%;
+      
+    }
+    .col {
+      display: flex;
+      padding: 10px 0;
+      &:before {
+        color: #6C7A89;
+        padding-right: 10px;
+        content: attr(data-label);
+        flex-basis: 50%;
+        text-align: right;
+      }
+    }
   }
 }
