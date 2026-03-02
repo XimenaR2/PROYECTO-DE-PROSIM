@@ -7,115 +7,109 @@
     <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/",
+        "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+      }
+    }
+    </script>
+
+    <style>
+      .camera-container {
+        width: 100%;
+        max-width: 480px;
+        height: 360px;
+        margin: 0 auto 20px auto;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #111;
+        position: relative;
+      }
+
+      #camera-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+      }
+
+      /* FIX: MindAR sets video z-index to -2, we override it */
+      .camera-container video {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        z-index: 1 !important;  /* <-- THE FIX */
+      }
+
+      /* Canvas (3D model) must be above the video */
+      .camera-container canvas {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 2 !important;  /* above video */
+      }
+    </style>
 </head>
 <body>
-    <header class="header-outer"><!-- header-->
+    <header class="header-outer">
         <div class="header-inner responsive-wrapper">
             <div class="header-logo">
-            <img src="../MULTIMEDIA/quiz1.jpg" alt="" >
-            <h2>VE EL VAR</h2>
-        </div>
+                <img src="../MULTIMEDIA/quiz1.jpg" alt="">
+                <h2>VE EL VAR</h2>
+            </div>
             <nav class="header-navigation">
-                <a href="home.html">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Escáner</span>
-                </a>
-
-                <a href="quiz.html">
-                    <i class="fas fa-gamepad"></i>
-                    <span>Quiz</span>
-                </a>
-
-                <a href="estadisticas.html">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Estadísticas</span>
-                </a>
-
-                <a href="filtros.html">
-                    <i class="fas fa-video"></i>
-                    <span>Edición</span>
-                </a>
+                <a href="home.html"><i class="fas fa-qrcode"></i><span>Escáner</span></a>
+                <a href="quiz.html"><i class="fas fa-gamepad"></i><span>Quiz</span></a>
+                <a href="estadisticas.html"><i class="fas fa-chart-bar"></i><span>Estadísticas</span></a>
+                <a href="filtros.html"><i class="fas fa-video"></i><span>Edición</span></a>
             </nav>
         </div>
     </header>
 
-<!--Escaner-->
-<!--
-<h2>Escanear con Cámara</h2>
-<h4>Escanea documentos desde tu dispositivo móvil a tu navegador</h4>
-<div class="escaner">
-    <video id="video" width="400" autoplay></video>
-    <canvas id="canvas" width="400"></canvas>
-</div>
-    <button id="btnActivar">Activar Cámara</button>
-    <button id="btnFoto">Escanear</button>
-    <button id="btnReset">Apagar Cámara</button>
+    <section class="scanner-section">
+        <div class="scanner-header">
+            <h2>Escanear con Cámara</h2>
+            <h4>Escanea la bandera para ver el jugador en AR</h4>
+        </div>
 
-    <article>
-        <h4>Información</h4>
-        <p></p>
-    </article>
+        <div class="camera-container" id="camera-container">
+            <div id="camera-placeholder">
+                <i class="fas fa-camera" style="font-size:48px;"></i>
+                <p style="margin-top:12px;">Presiona "Abrir Cámara"</p>
+            </div>
+        </div>
 
-    <aside>
-        <button>Animar</button>
-        <button>Baile</button>
-        <button>Saludo</button>
-        <button>Efectos</button>
-    </aside>
-    
--->
+        <div class="camera-buttons">
+            <button id="btnActivar">Abrir Cámara</button>
+            <button id="btnReiniciar" style="display:none;">Cerrar Cámara</button>
+        </div>
 
-<!--Escaner-->
+        <div class="bottom-section">
+            <article class="info-box">
+                <h3>INFORMACION</h3>
+                <p id="infoText"></p>
+            </article>
+            <aside class="actions">
+                <button>Saludo</button>
+                <button>Baile</button>
+                <button>Efecto 1</button>
+                <button>Efecto 2</button>
+            </aside>
+        </div>
+    </section>
 
-<section class="scanner-section">
-
-    <div class="scanner-header">
-        <h2>Escanear con Cámara</h2>
-        <h4>Escanea documentos desde tu dispositivo móvil a tu navegador</h4>
-    </div>
-
-    <!-- Contenedor cámara -->
-    <div class="camera-container">
-        <video id="video" autoplay></video>
-    </div>
-
-
-    <!-- <div class="camera-container">
-        <div id="reader"></div>
-    </div> -->
-
-    <!-- Botones cámara -->
-    <div class="camera-buttons">
-        <button id="btnActivar">Abrir Cámara</button>
-        <button id="btnFoto">Escanear</button>
-        <button id="btnReiniciar" style="display:none;">Escanear otro</button>
-    </div>
-
-    <!-- Sección inferior -->
-    <div class="bottom-section">
-
-        <!-- INFORMACION -->
-        <article class="info-box">
-            <h3>INFORMACION</h3>
-            <p id="infoText"></p>
-        </article>
-
-        <!-- Botones verticales -->
-        <aside class="actions">
-            <button>Saludo</button>
-            <button>Baile</button>
-            <button>Efecto 1</button>
-            <button>Efecto 2</button>
-        </aside>
-
-    </div>
-
-</section>
-
-
-<script src="https://unpkg.com/html5-qrcode"></script>
-    <!-- <script src="../JS/script.js"></script> -->
-    <script src="../JS/home-2.js"></script>
-
+    <script type="module" src="../JS/home-2.js"></script>
 </body>
 </html>
