@@ -8,8 +8,10 @@
 }
 
 body {
-  margin: 0;
-  background: #ffffff;
+  background-image: url("../MULTIMEDIA/grass.jpg");
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  margin:0;
 }
 
 /* =====================
@@ -111,4 +113,5 @@ body {
   .navbar {
     padding: 0 20px;
   }
+
 }
