@@ -1,189 +1,111 @@
-// * * * * * * * * * * * * * * * *  * FOTO * * * * * * * * * * * * * * * * * *  * * * * *
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MindARThree } from "mindar-image-three";
 
-
-// const btnActivar = document.getElementById("btnActivar");
-// const btnFoto = document.getElementById("btnFoto");
-// const infoText = document.getElementById("infoText");
-
-// let html5QrCode;
-// let scanning = false;
-
-// // 🔥 Abrir cámara
-// btnActivar.addEventListener("click", () => {
-
-//     if(scanning) return;
-
-//     html5QrCode = new Html5Qrcode("reader");
-
-//     Html5Qrcode.getCameras().then(devices => {
-//         if (devices && devices.length) {
-
-//             html5QrCode.start(
-//                 devices[0].id,
-//                 {
-//                     fps: 10,
-//                     qrbox: 250
-//                 },
-//                 (decodedText) => {
-//                     // 🔥 Cuando detecta QR
-//                     infoText.textContent = "QR Detectado: " + decodedText;
-//                     detenerCamara();
-//                 },
-//                 (errorMessage) => {
-//                     // Ignoramos errores de lectura
-//                 }
-//             );
-
-//             scanning = true;
-//         }
-//     }).catch(err => {
-//         alert("No se pudo acceder a la cámara");
-//         console.error(err);
-//     });
-// });
-
-// // 🔥 Botón Escanear (solo mensaje si no está activa)
-// btnFoto.addEventListener("click", () => {
-//     if(!scanning){
-//         alert("Primero abre la cámara");
-//     }
-// });
-
-// // 🔥 Detener cámara
-// function detenerCamara(){
-//     if(html5QrCode){
-//         html5QrCode.stop().then(() => {
-//             scanning = false;
-//         }).catch(err => console.error(err));
-//     }
-// }
-
-// * * * * * * * * * * * * * * * *  * ESCANER * * * * * * * * * * * * * * * * * *  * * * * *
-// const btnActivar = document.getElementById("btnActivar");
-// const infoText = document.getElementById("infoText");
-
-// let html5QrCode;
-// let scanning = false;
-
-// btnActivar.addEventListener("click", () => {
-
-//     if(scanning) return;
-
-//     html5QrCode = new Html5Qrcode("reader");
-
-//     html5QrCode.start(
-//         { facingMode: "environment" }, // 🔥 fuerza cámara trasera en móvil
-//         {
-//             fps: 10,
-//             qrbox: { width: 250, height: 250 }
-//         },
-//         (decodedText) => {
-//             infoText.textContent = "QR Detectado: " + decodedText;
-//             detenerCamara();
-//         },
-//         (errorMessage) => {
-//             // ignoramos errores de lectura
-//         }
-//     ).then(() => {
-//         scanning = true;
-//     }).catch(err => {
-//         alert("No se pudo acceder a la cámara");
-//         console.error(err);
-//     });
-// });
-
-// function detenerCamara(){
-//     if(html5QrCode){
-//         html5QrCode.stop().then(() => {
-//             scanning = false;
-//         }).catch(err => console.error(err));
-//     }
-// }
-
-
-// * * * * * * * * * * * * * * * *  * ESCANER con la camara trasera y boton de reinico * * * * * * * * * * * * * * * * * *  * * * * *
-
-
-const btnActivar = document.getElementById("btnActivar");
+const btnActivar   = document.getElementById("btnActivar");
 const btnReiniciar = document.getElementById("btnReiniciar");
-const infoText = document.getElementById("infoText");
+const infoText     = document.getElementById("infoText");
+const container    = document.getElementById("camera-container");
+const placeholder  = document.getElementById("camera-placeholder");
 
-let html5QrCode;
-let scanning = false;
+let mindarInstance = null;
+let started        = false;
+let scanned        = false;
 
-async function iniciarCamara() {
+console.log("[AR] ✅ Script loaded, MindARThree:", !!MindARThree);
 
-    if(scanning) return;
+// ── Abrir Cámara ──────────────────────────────────────────────────────────────
+btnActivar.addEventListener("click", async () => {
+  btnActivar.style.display   = "none";
+  btnReiniciar.style.display = "inline-block";
+  placeholder.style.display  = "none";
+  infoText.textContent       = "Iniciando cámara…";
 
-    html5QrCode = new Html5Qrcode("reader");
+  try {
+    mindarInstance = new MindARThree({
+      container:      container,
+      imageTargetSrc: "./targets.mind",
+      uiScanning:     false,
+      uiLoading:      false,
+    });
 
-    try {
+    const { renderer, scene, camera } = mindarInstance;
 
-        // 🔥 Intentar forzar cámara trasera
-        await html5QrCode.start(
-            { facingMode: { exact: "environment" } },
-            {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-            },
-            onScanSuccess
-        );
+    // Lighting
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(0, 5, 5);
+    scene.add(dirLight);
 
-        scanning = true;
+    // Anchor for target index 0 (your flag)
+    const anchor = mindarInstance.addAnchor(0);
 
-    } catch (error) {
+    // Load the 3D model
+    const loader = new GLTFLoader();
+    loader.load(
+      "../MODELS/jugador.glb",
+      (gltf) => {
+        console.log("[AR] ✅ Model loaded!");
+        const model = gltf.scene;
+        model.scale.set(0.1, 0.1, 0.1);
+        model.position.set(0, 0, 0);
+        anchor.group.add(model);
+      },
+      undefined,
+      (err) => console.error("[AR] ❌ Model error:", err)
+    );
 
-        // 🔥 Si falla, usar cualquier cámara disponible
-        try {
-            const devices = await Html5Qrcode.getCameras();
-            if (devices && devices.length) {
+    // Target found: show info
+    anchor.onTargetFound = () => {
+      console.log("[AR] 🎯 TARGET FOUND");
+      if (!scanned) {
+        scanned = true;
+        infoText.innerHTML = `
+          <strong>🇲🇽 Bandera de México</strong><br><br>
+          País: México<br>
+          Continente: América del Norte<br>
+          Capital: Ciudad de México<br>
+          Colores: Verde, Blanco y Rojo<br>
+          Símbolo: Águila devorando una serpiente
+        `;
+      }
+    };
 
-                await html5QrCode.start(
-                    devices[0].id,
-                    {
-                        fps: 10,
-                        qrbox: { width: 250, height: 250 }
-                    },
-                    onScanSuccess
-                );
+    anchor.onTargetLost = () => {
+      console.log("[AR] TARGET LOST");
+    };
 
-                scanning = true;
-            }
-        } catch (err) {
-            alert("No se pudo acceder a la cámara");
-            console.error(err);
-        }
-    }
-}
+    // Start AR
+    await mindarInstance.start();
+    started = true;
+    infoText.textContent = "Apunta la cámara a la bandera 🏁";
 
-function onScanSuccess(decodedText) {
+    // Render loop
+    renderer.setAnimationLoop(() => {
+      renderer.render(scene, camera);
+    });
 
-    infoText.textContent = "QR Detectado: " + decodedText;
-
-    detenerCamara();
-
-    btnActivar.style.display = "none";
-    btnReiniciar.style.display = "inline-block";
-}
-
-function detenerCamara() {
-    if (html5QrCode && scanning) {
-        html5QrCode.stop().then(() => {
-            scanning = false;
-        }).catch(err => console.error(err));
-    }
-}
-
-// 🔥 Abrir cámara
-btnActivar.addEventListener("click", iniciarCamara);
-
-// 🔥 Escanear otro
-btnReiniciar.addEventListener("click", () => {
-
-    infoText.textContent = "";
-
+  } catch (err) {
+    console.error("[AR] Error:", err);
+    infoText.textContent      = "❌ Error: " + err.message;
+    placeholder.style.display = "flex";
+    btnActivar.style.display   = "inline-block";
     btnReiniciar.style.display = "none";
-    btnActivar.style.display = "inline-block";
+  }
+});
 
-    iniciarCamara();
+// ── Cerrar Cámara ─────────────────────────────────────────────────────────────
+btnReiniciar.addEventListener("click", async () => {
+  if (mindarInstance && started) {
+    mindarInstance.renderer.setAnimationLoop(null);
+    await mindarInstance.stop();
+    mindarInstance = null;
+    started        = false;
+  }
+
+  placeholder.style.display  = "flex";
+  btnReiniciar.style.display = "none";
+  btnActivar.style.display   = "inline-block";
+  scanned                    = false;
+  infoText.textContent       = "";
 });
