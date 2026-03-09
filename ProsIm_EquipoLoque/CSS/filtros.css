@@ -1,26 +1,22 @@
 /* =====================
    SHARED BASE
 ===================== */
-
+body {
+  background-image: url("../MULTIMEDIA/grass.jpg");
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  margin: 0;
+}
 * {
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-body {
-  background-image: url("../MULTIMEDIA/grass.jpg");
-  background-repeat: repeat;
-  background-size: 500px 500px;
-  margin:0;
-}
-
 /* =====================
-   EDITOR PAGE BACKGROUND
+   EDITOR PAGE
 ===================== */
-
 .editor-page {
   min-height: calc(100vh - 110px);
-  background: linear-gradient(90deg, #0f4c81, #33c6b8);
   padding: 40px;
   color: white;
   text-align: center;
@@ -39,7 +35,6 @@ body {
 /* =====================
    EDITOR CARD
 ===================== */
-
 .editor-card {
   max-width: 1100px;
   margin: 0 auto;
@@ -49,69 +44,210 @@ body {
   padding: 24px;
 
   display: grid;
-  grid-template-columns: 200px 1fr 220px;
+  grid-template-columns: 160px 1fr 200px;
   gap: 24px;
+  align-items: start;
 
   color: #333;
 }
 
-/* LEFT TOOLS */
+/* ── TOOLS ── */
 .tools-panel {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tools-panel button {
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #f2f2f2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: #f5f5f5;
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.2s;
 }
 
-/* PREVIEW */
+.tools-panel button i {
+  font-size: 18px;
+}
+
+.tools-panel button:hover {
+  background: #e8faf9;
+  color: #33c65f;
+  border-color: #33c65f;
+}
+
+.tools-panel button.active {
+  background: #33c65f;
+  color: white;
+  border-color: #2ab3a6;
+  box-shadow: 0 4px 14px rgba(51,198,184,0.4);
+}
+
+/* ── PREVIEW ── */
 .preview-panel {
-  background: #000;
+  background: #111;
   border-radius: 14px;
+  min-height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #aaa;
   font-size: 18px;
+  overflow: hidden;
+  position: relative;
 }
 
-/* RIGHT ACTIONS */
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.5;
+}
+
+.preview-placeholder i {
+  font-size: 48px;
+}
+
+.preview-placeholder p {
+  margin: 0;
+  font-size: 15px;
+}
+
+/* ── ACTIONS ── */
 .actions-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .actions-panel button {
-  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px;
   border-radius: 12px;
-  border: none;
+  border: 2px solid #eee;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  background: white;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.actions-panel button:hover {
+  border-color: #33c65f;
+  color: #33c65f;
 }
 
 .actions-panel .primary {
-  background: #33c6b8;
+  background: #33c65f;
   color: white;
-  font-weight: bold;
+  border-color: #33c65f;
 }
 
-/* =====================
-   RESPONSIVE
-===================== */
+.actions-panel .primary:hover {
+  background: #2ab3a6;
+  color: white;
+}
 
+.actions-panel .library-btn {
+  background: linear-gradient(135deg, #33c65f, #33c65f);
+  color: white;
+  border-color: #33c65f;
+  border-width: 2px;
+}
+
+.actions-panel .library-btn:hover {
+  background: #33c65f;
+  color: white;
+  border-color: #33c65f;
+}
+
+/* ── SUB-PANELS ── */
+.tool-subpanel {
+  grid-column: 1 / -1;
+  background: #f9fefe;
+  border: 2px solid #e0f7f5;
+  border-radius: 14px;
+  padding: 20px;
+  animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.subpanel-btn {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.subpanel-btn:hover {
+  border-color: #33c65f;
+  color: #33c65f;
+}
+
+.subpanel-btn.active {
+  background: #33c65f;
+  color: white;
+  border-color: #33c65f;
+}
+
+.subpanel-apply {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #33c65f;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.subpanel-apply:hover {
+  background: #33c65f;
+}
+
+/* ── TEXT OVERLAYS ── */
+.text-overlay {
+  z-index: 10;
+}
+
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .editor-card {
     grid-template-columns: 1fr;
   }
 
-  .navbar {
-    padding: 0 20px;
+  .tools-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 
+  .tools-panel button {
+    flex: 1;
+    min-width: 80px;
+  }
 }
