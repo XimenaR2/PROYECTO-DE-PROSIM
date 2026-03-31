@@ -341,7 +341,7 @@ const EQUIPOS = [
   {
     nombre:  "Panamá",
     bandera: "🇵🇦",
-    textura: "../TEXTURES/PANAMA.PNG",   // ⚠️ nombre exacto de tu archivo
+    textura: "../TEXTURES/PANAA.PNG",   // ⚠️ nombre exacto de tu archivo
     info: `<strong>🇵🇦 Panamá</strong><br><br>
       Apodo: Los Canaleros<br>
       Confederación: CONCACAF<br>
@@ -376,116 +376,219 @@ const EQUIPOS = [
   },
 ];
 
+
 // ── Referencias al DOM ────────────────────────────────────────────────────────
 const btnActivar   = document.getElementById("btnActivar");
 const btnReiniciar = document.getElementById("btnReiniciar");
+const btnSaludo    = document.querySelector(".actions button:nth-child(1)");
+const btnBaile     = document.querySelector(".actions button:nth-child(2)");
 const infoText     = document.getElementById("infoText");
 const container    = document.getElementById("camera-container");
 const placeholder  = document.getElementById("camera-placeholder");
 
 let mindarInstance = null;
 let started        = false;
+const clock        = new THREE.Clock();
+const anchorStates = [];
 
-console.log(`[AR] ✅ Script cargado | ${EQUIPOS.length} equipos configurados`);
+console.log(`[AR] Script cargado | ${EQUIPOS.length} equipos configurados`);
 
-// ── Aplica una textura PNG a todos los meshes del modelo ──────────────────────
+// ── Texturas ──────────────────────────────────────────────────────────────────
+const textureCache = {};
+
 function aplicarTextura(model, rutaTextura) {
-  const textureLoader = new THREE.TextureLoader();
-  textureLoader.load(
+  if (textureCache[rutaTextura]) { _asignarTextura(model, textureCache[rutaTextura]); return; }
+  new THREE.TextureLoader().load(
     rutaTextura,
-    (texture) => {
-      texture.flipY    = false;               // obligatorio para modelos GLTF
-      texture.encoding = THREE.sRGBEncoding;
-      model.traverse((child) => {
-        if (child.isMesh) {
-          child.material             = child.material.clone();
-          child.material.map         = texture;
-          child.material.needsUpdate = true;
-        }
-      });
-      console.log(`[AR] ✅ Textura aplicada: ${rutaTextura}`);
+    (tex) => {
+      tex.flipY = false;
+      tex.encoding = THREE.sRGBEncoding;
+      textureCache[rutaTextura] = tex;
+      _asignarTextura(model, tex);
+      console.log("[AR] Textura:", rutaTextura);
     },
     undefined,
-    (err) => console.warn(`[AR] ⚠️ Textura no cargada: ${rutaTextura}`, err)
+    (err) => console.warn("[AR] Sin textura:", rutaTextura, err)
   );
 }
 
-// ── Abrir Cámara ──────────────────────────────────────────────────────────────
+function _asignarTextura(model, tex) {
+  model.traverse(c => {
+    if (c.isMesh || c.isSkinnedMesh) {
+      c.material = c.material.clone();
+      c.material.map = tex;
+      c.material.needsUpdate = true;
+    }
+  });
+}
+
+// ── Animacion ─────────────────────────────────────────────────────────────────
+// Transfiere un AnimationClip de un GLB al esqueleto del modelo Jugador
+// Funciona porque ambos tienen exactamente los mismos huesos (mixamorig:*)
+function transferirClip(clip, modelTarget) {
+  if (!clip) return null;
+  // Clona el clip para no modificar el original
+  const nuevoClip = clip.clone();
+  // Filtra solo quaternion — elimina position/scale que causan root motion
+  nuevoClip.tracks = nuevoClip.tracks.filter(t => t.name.endsWith('.quaternion'));
+  return nuevoClip;
+}
+
+function playClip(state, clip) {
+  if (!clip || !state) return;
+  if (state.currentAction) state.currentAction.fadeOut(0.2);
+  const action = state.mixer.clipAction(clip);
+  action.reset().fadeIn(0.2).play();
+  state.currentAction = action;
+  console.log("[AR] Reproduciendo:", clip.name);
+}
+
+// ── Botones ───────────────────────────────────────────────────────────────────
+btnSaludo.addEventListener("click", () => {
+  const s = anchorStates.find(s => s.visible);
+  if (!s) { infoText.textContent = "Apunta la camara a un escudo primero"; return; }
+  playClip(s, s.clipWaving);
+});
+
+btnBaile.addEventListener("click", () => {
+  const s = anchorStates.find(s => s.visible);
+  if (!s) { infoText.textContent = "Apunta la camara a un escudo primero"; return; }
+  playClip(s, s.clipDance);
+});
+
+// ── Abrir Camara ──────────────────────────────────────────────────────────────
 btnActivar.addEventListener("click", async () => {
   btnActivar.style.display   = "none";
   btnReiniciar.style.display = "inline-block";
   placeholder.style.display  = "none";
-  infoText.textContent       = "Iniciando cámara…";
+  infoText.textContent       = "Cargando...";
 
   try {
     mindarInstance = new MindARThree({
       container:      container,
       imageTargetSrc: "./targets.mind",
+      filterMinCF:    0.001,
+      filterBeta:     0.01,
+      missTolerance:  10,
       uiScanning:     false,
       uiLoading:      false,
     });
 
     const { renderer, scene, camera } = mindarInstance;
 
-    // Iluminación
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    console.log(`[DBG] Container: ${w}x${h}`);
+
     scene.add(new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-    dirLight.position.set(0, 5, 5);
-    scene.add(dirLight);
+    const dir = new THREE.DirectionalLight(0xffffff, 1.5);
+    dir.position.set(0, 5, 5);
+    scene.add(dir);
 
-    // Carga el modelo GLB una sola vez
     const loader = new GLTFLoader();
-    const gltf   = await new Promise((resolve, reject) =>
-      loader.load("../MODELS/jugador.glb", resolve, undefined, reject)
-    );
-    console.log("[AR] ✅ Modelo cargado");
 
-    // Crea un anchor por cada equipo
-    EQUIPOS.forEach((equipo, index) => {
-      const anchor     = mindarInstance.addAnchor(index);
-      const modelClone = gltf.scene.clone(true);
+    // Carga los 3 GLB en paralelo
+    const [gltfJugador, gltfWaving, gltfDance] = await Promise.all([
+      new Promise((res, rej) => loader.load("../MODELS/Jugador.glb", res, undefined, rej)),
+      new Promise((res, rej) => loader.load("../MODELS/Waving.glb",  res, undefined, rej)),
+      new Promise((res, rej) => loader.load("../MODELS/Dance.glb",   res, undefined, rej)),
+    ]);
+    console.log("[AR] 3 modelos cargados OK");
 
-      modelClone.scale.set(0.1, 0.1, 0.1);
-      modelClone.position.set(0, 0, 0);
+    // Extrae y prepara los clips (solo rotaciones, sin root motion)
+    const clipWavingMaster = transferirClip(gltfWaving.animations[0], null);
+    const clipDanceMaster  = transferirClip(gltfDance.animations[0],  null);
+    console.log("[AR] Clips listos:", clipWavingMaster?.tracks.length, "tracks waving |", clipDanceMaster?.tracks.length, "tracks dance");
 
-      aplicarTextura(modelClone, equipo.textura);
-      anchor.group.add(modelClone);
+    // Crea un anchor por equipo
+    // Cada anchor carga su propia instancia del GLB para evitar problemas con clone()
+    const anchorPromises = EQUIPOS.map((equipo, index) => {
+      return new Promise((res) => {
+        loader.load("../MODELS/Waving.glb", (gltfFresh) => {
+          const anchor = mindarInstance.addAnchor(index);
+          const model  = gltfFresh.scene;
 
-      anchor.onTargetFound = () => {
-        console.log(`[AR] 🎯 Detectado → ${equipo.nombre} (índice ${index})`);
-        infoText.innerHTML = `${equipo.bandera} ${equipo.info}`;
-      };
+          anchor.group.add(model);
+          // El cubo era scale=1, position=(0,0,0) y se veía centrado en el escudo
+          // El modelo mide 4.3u → scale=0.23 lo pone a ~1u (mismo que el cubo)
+          // position.y = mitad de la altura para que quede centrado igual que el cubo
+          model.scale.setScalar(0.15);
+          model.position.set(0, -1, 0);
 
-      anchor.onTargetLost = () => {
-        console.log(`[AR] 📴 Perdido → ${equipo.nombre}`);
-      };
+          const mixer = new THREE.AnimationMixer(model);
+
+          // Clip Waving viene en este GLB fresco
+          const clipWav = gltfFresh.animations[0]
+            ? (() => { const c = gltfFresh.animations[0].clone(); c.tracks = c.tracks.filter(t => t.name.endsWith('.quaternion')); return c; })()
+            : null;
+          // Clip Dance viene del master
+          const clipDnc = clipDanceMaster;
+
+          let currentAction = null;
+          if (clipWav) {
+            currentAction = mixer.clipAction(clipWav);
+            currentAction.play();
+            currentAction.paused = true;
+          }
+
+          const state = { visible: false, model, mixer, clipWaving: clipWav, clipDance: clipDnc, currentAction, anchor };
+          anchorStates.push(state);
+
+          anchor.onTargetFound = () => {
+            console.log(`[AR] Detectado: ${equipo.nombre} (${index})`);
+            state.visible = true;
+            aplicarTextura(model, equipo.textura);
+            infoText.innerHTML = `${equipo.bandera} ${equipo.info}`;
+            if (state.currentAction) state.currentAction.paused = false;
+          };
+
+          anchor.onTargetLost = () => {
+            console.log(`[AR] Perdido: ${equipo.nombre}`);
+            state.visible = false;
+            if (state.currentAction) state.currentAction.paused = true;
+          };
+
+          res();
+        }, undefined, (err) => { console.error(`GLB error anchor ${index}:`, err); res(); });
+      });
     });
 
-    // Inicia AR
+    console.log("[AR] Cargando modelos por anchor...");
+    await Promise.all(anchorPromises);
+    console.log("[AR] Todos los anchors listos");
+
+
+
     await mindarInstance.start();
     started = true;
-    infoText.textContent = "Apunta la cámara a un escudo 🏆";
+    infoText.textContent = "Apunta la camara a un escudo 🏆";
 
-    // Render loop
-    renderer.setAnimationLoop(() => renderer.render(scene, camera));
+    renderer.setAnimationLoop(() => {
+      const delta = clock.getDelta();
+      anchorStates.forEach(s => s.mixer.update(delta));
+      renderer.render(scene, camera);
+    });
 
   } catch (err) {
-    console.error("[AR] ❌ Error:", err);
-    infoText.textContent      = "❌ Error: " + err.message;
+    console.error("[AR] Error:", err);
+    infoText.textContent      = "Error: " + err.message;
     placeholder.style.display = "flex";
     btnActivar.style.display   = "inline-block";
     btnReiniciar.style.display = "none";
   }
 });
 
-// ── Cerrar Cámara ─────────────────────────────────────────────────────────────
+// ── Cerrar Camara ─────────────────────────────────────────────────────────────
 btnReiniciar.addEventListener("click", async () => {
   if (mindarInstance && started) {
     mindarInstance.renderer.setAnimationLoop(null);
     await mindarInstance.stop();
     mindarInstance = null;
-    started        = false;
+    started = false;
   }
+  anchorStates.length        = 0;
   placeholder.style.display  = "flex";
   btnReiniciar.style.display = "none";
   btnActivar.style.display   = "inline-block";
